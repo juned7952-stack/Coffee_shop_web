@@ -1,0 +1,545 @@
+﻿{% extends "cafe/base.html" %}
+{% load static %}
+
+{% block extra_head %}
+<!-- Inject JSON Data for JavaScript Frontend -->
+<script id="menuItemsData" type="application/json">
+    {{ items_json|safe }}
+</script>
+<script id="categoriesData" type="application/json">
+    {{ categories_json|safe }}
+</script>
+{% endblock %}
+
+{% block content %}
+<!-- ============================================ -->
+<!-- 1. HERO SECTION WITH 3D THREE.JS STAGE       -->
+<!-- ============================================ -->
+<section class="hero-section" id="threeStageSection">
+    <div class="container hero-layout">
+        <!-- Hero Text Column -->
+        <div class="hero-text-col">
+            <div class="hero-badge">
+                <span class="badge-glow-icon">⚡</span>
+                <span>AVANT-GARDE MOLECULAR GASTRONOMY</span>
+            </div>
+            <h1 class="hero-heading font-syne">
+                THE ART OF <span class="text-gradient-gold">ILLUSION</span>,<br>
+                DELIVERED IN <span class="text-neon-cyan">15 MINUTES</span>.
+            </h1>
+            <p class="hero-lead">
+                Welcome to Farzi Cafe & Gourmet Shop. Explore liquid nitrogen creations, smoked molecular sips, and charcoal truffle sliders rendered in interactive 3D — dispatched instantly from hyper-speed micro-kitchen pods.
+            </p>
+
+            <!-- Hero Action Buttons -->
+            <div class="hero-cta-group">
+                <a href="#menuSection" class="btn btn-gold btn-lg">
+                    <span>Explore 3D Menu</span>
+                    <span class="btn-icon">🍽️</span>
+                </a>
+                <a href="#speedGuaranteeSection" class="btn btn-glass btn-lg">
+                    <span>15-Min Guarantee</span>
+                    <span class="btn-icon">⚡</span>
+                </a>
+            </div>
+
+            <!-- Real-time Micro-Kitchen Stats -->
+            <div class="hero-stats-row">
+                <div class="stat-card">
+                    <span class="stat-num font-syne text-gold">3.4m</span>
+                    <span class="stat-label">Avg Dispatch Time</span>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-num font-syne text-neon-cyan">-196°C</span>
+                    <span class="stat-label">Liquid N2 Lock</span>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-num font-syne text-crimson">100%</span>
+                    <span class="stat-label">Electric Fleet</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- 3D Three.js Interactive Canvas Column -->
+        <div class="hero-canvas-col">
+            <div class="three-stage-card glassmorphism-card">
+                <!-- 3D Dish Selector Tabs -->
+                <div class="stage-tabs-bar">
+                    <button class="stage-tab-btn active" data-model="cocktail" id="heroTabCocktail">
+                        <span>🍸 Farzi Mist Potion</span>
+                    </button>
+                    <button class="stage-tab-btn" data-model="burger" id="heroTabBurger">
+                        <span>🍔 Truffle Galouti Slider</span>
+                    </button>
+                    <button class="stage-tab-btn" data-model="dessert" id="heroTabDessert">
+                        <span>🍨 Nitro Gold Ghewar</span>
+                    </button>
+                </div>
+
+                <!-- Three.js Canvas Container -->
+                <div class="three-canvas-container" id="heroCanvasContainer">
+                    <canvas id="heroThreeCanvas"></canvas>
+                    
+                    <!-- Floating Stage UI Badges -->
+                    <div class="canvas-overlay-top">
+                        <span class="live-3d-badge">
+                            <span class="live-dot"></span> 3D REAL-TIME WEBGL
+                        </span>
+                        <span class="canvas-item-title" id="stageItemTitle">Farzi Mist Molecular Cocktail</span>
+                    </div>
+
+                    <div class="canvas-overlay-bottom">
+                        <div class="interaction-hint">
+                            <span class="hint-icon">🖱️</span>
+                            <span>Drag to rotate • Scroll to zoom • Switch dishes above</span>
+                        </div>
+                        <button class="btn btn-sm btn-gold" id="stageQuickAddBtn">
+                            <span>Add to Bag • ₹349</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ============================================ -->
+<!-- 2. FASTEST DELIVERY & ETA CALCULATOR SECTION  -->
+<!-- ============================================ -->
+<section class="speed-section" id="speedGuaranteeSection">
+    <div class="container">
+        <!-- Speed Banner Card -->
+        <div class="speed-banner-card glassmorphism-card">
+            <div class="speed-banner-header">
+                <div class="speed-badge-pill">
+                    <span class="pill-spark">⚡</span>
+                    <span>FARZI HYPER-SPEED TURBO LOGISTICS</span>
+                </div>
+                <h2 class="speed-title font-syne">
+                    DOORSTEP IN <span class="text-gold">15 MINUTES</span>, OR IT'S FREE.
+                </h2>
+                <p class="speed-subtitle">
+                    Powered by hyper-local micro-kitchen pods, thermal-nitrogen locking packaging, and dedicated 100% electric rapid couriers. Check your address dispatch time right now.
+                </p>
+            </div>
+
+            <!-- Interactive Speed & Distance Estimator -->
+            <div class="speed-calculator-box">
+                <div class="calc-input-group">
+                    <div class="calc-field">
+                        <label for="calcPincode">Delivery Pincode</label>
+                        <input type="text" id="calcPincode" class="calc-input" placeholder="e.g. 110001, 122002, 560001" value="110001">
+                    </div>
+                    <div class="calc-field flex-grow">
+                        <label for="calcAddress">Street / Area / Landmark</label>
+                        <input type="text" id="calcAddress" class="calc-input" placeholder="e.g. Inner Circle, Connaught Place, Block B" value="Inner Circle, Connaught Place">
+                    </div>
+                    <button class="btn btn-gold btn-calc" id="btnCalculateEta">
+                        <span>Check Live Speed</span>
+                        <span class="btn-icon">⚡</span>
+                    </button>
+                </div>
+
+                <!-- Real-Time Calculation Result Display -->
+                <div class="calc-result-panel" id="calcResultPanel">
+                    <div class="calc-stat-item">
+                        <span class="res-label">Estimated Delivery</span>
+                        <span class="res-value font-syne text-gold" id="calcResultEta">⚡ 11 Mins</span>
+                    </div>
+                    <div class="calc-stat-item">
+                        <span class="res-label">Micro-Kitchen Distance</span>
+                        <span class="res-value font-syne" id="calcResultDist">1.2 km</span>
+                    </div>
+                    <div class="calc-stat-item">
+                        <span class="res-label">Dispatched From</span>
+                        <span class="res-value" id="calcResultPod">Farzi Hub #01 (Connaught Pod)</span>
+                    </div>
+                    <div class="calc-stat-item">
+                        <span class="res-label">Delivery Status</span>
+                        <span class="res-value text-emerald font-bold">⚡ Flash Transit Ready</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 4 Pillars of Speed -->
+            <div class="speed-pillars-grid">
+                <div class="pillar-card">
+                    <div class="pillar-icon">⏱️</div>
+                    <h3 class="pillar-title font-syne">4-Min Molecular Prep</h3>
+                    <p class="pillar-desc">
+                        Our chefs operate in flash-ticket stations optimized to craft molecular appetizers and smoked drinks in under 240 seconds.
+                    </p>
+                </div>
+                <div class="pillar-card">
+                    <div class="pillar-icon">❄️</div>
+                    <h3 class="pillar-title font-syne">Nitrogen Temp-Lock</h3>
+                    <p class="pillar-desc">
+                        Sub-zero desserts and piping-hot claypot curries are sealed in vacuum thermal insulation pods that maintain exact temperatures.
+                    </p>
+                </div>
+                <div class="pillar-card">
+                    <div class="pillar-icon">⚡</div>
+                    <h3 class="pillar-title font-syne">Turbo EV Fleet</h3>
+                    <p class="pillar-desc">
+                        Custom tuned rapid electric bikes navigate urban corridors with live radar GPS tracking and zero tailpipe emissions.
+                    </p>
+                </div>
+                <div class="pillar-card">
+                    <div class="pillar-icon">🛡️</div>
+                    <h3 class="pillar-title font-syne">15-Minute Guarantee</h3>
+                    <p class="pillar-desc">
+                        If our courier arrives even 60 seconds after the 15-minute timer expires, your meal is 100% complimentary.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ============================================ -->
+<!-- 3. INTERACTIVE 3D MENU SECTION                -->
+<!-- ============================================ -->
+<section class="menu-section" id="menuSection">
+    <div class="container">
+        <!-- Menu Header -->
+        <div class="section-header text-center">
+            <span class="section-tag">MOLECULAR GASTRONOMY & SHOP</span>
+            <h2 class="section-title font-syne">EXPLORE THE <span class="text-gold">FARZI ILLUSION</span></h2>
+            <p class="section-desc">
+                Click any dish to inspect its 3D anatomy, explode its culinary layers, and add directly to your 15-minute turbo delivery bag.
+            </p>
+        </div>
+
+        <!-- Filter & Search Controls Bar -->
+        <div class="filter-controls-bar glassmorphism-bar">
+            <!-- Search Bar -->
+            <div class="search-box">
+                <span class="search-icon">🔍</span>
+                <input type="text" id="menuSearchInput" class="search-input" placeholder="Search smoked potions, bao, sliders, arancini, cheesecake...">
+                <button class="clear-search-btn" id="clearSearchBtn" style="display:none;">✕</button>
+            </div>
+
+            <!-- Dietary Filters -->
+            <div class="dietary-filters">
+                <button class="filter-chip active" data-diet="all">All</button>
+                <button class="filter-chip" data-diet="veg">🟢 Veg Only</button>
+                <button class="filter-chip" data-diet="non-veg">🔴 Non-Veg</button>
+                <button class="filter-chip" data-diet="signature">⭐ Farzi Signature</button>
+            </div>
+
+            <!-- Sort By Dropdown -->
+            <div class="sort-box">
+                <label for="menuSortSelect" class="sort-label">Sort:</label>
+                <select id="menuSortSelect" class="sort-select">
+                    <option value="featured">Farzi Recommended</option>
+                    <option value="price-asc">Price: Low to High</option>
+                    <option value="price-desc">Price: High to Low</option>
+                    <option value="prep">Fastest Prep Time</option>
+                    <option value="rating">Top Rated ★</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- Category Tabs -->
+        <div class="category-tabs-scroll">
+            <button class="cat-tab active" data-cat="all">
+                <span class="cat-icon">✨</span>
+                <span>All Creations</span>
+            </button>
+            {% for category in categories %}
+            <button class="cat-tab" data-cat="{{ category.slug }}">
+                <span class="cat-icon">{{ category.icon }}</span>
+                <span>{{ category.name }}</span>
+            </button>
+            {% endfor %}
+        </div>
+
+        <!-- Menu Grid -->
+        <div class="menu-grid" id="menuGrid">
+            {% for item in items %}
+            <div class="menu-card glassmorphism-card card-3d-tilt" 
+                 data-id="{{ item.id }}"
+                 data-slug="{{ item.slug }}"
+                 data-category="{{ item.category.slug }}"
+                 data-veg="{{ item.is_veg|yesno:'true,false' }}"
+                 data-signature="{{ item.is_signature|yesno:'true,false' }}"
+                 data-price="{{ item.price }}"
+                 data-prep="{{ item.prep_time_mins }}"
+                 data-rating="{{ item.rating }}"
+                 data-model="{{ item.model_type }}">
+                
+                <!-- Card Header Badges -->
+                <div class="card-badges">
+                    <span class="diet-badge {% if item.is_veg %}badge-veg{% else %}badge-non-veg{% endif %}">
+                        <span class="diet-dot"></span>
+                        {% if item.is_veg %}VEG{% else %}NON-VEG{% endif %}
+                    </span>
+
+                    {% if item.is_signature %}
+                    <span class="signature-badge">
+                        <span>⭐ FARZI SIGNATURE</span>
+                    </span>
+                    {% endif %}
+
+                    <span class="prep-badge">⚡ {{ item.prep_time_mins }}m prep</span>
+                </div>
+
+                <!-- 3D Preview Visual Stage / Thumbnail -->
+                <div class="card-visual-stage" data-model="{{ item.model_type }}">
+                    <div class="stage-hologram-effect"></div>
+                    <div class="item-3d-symbol">
+                        {% if item.model_type == 'cocktail' %}🍸
+                        {% elif item.model_type == 'burger' %}🍔
+                        {% elif item.model_type == 'dessert' %}🍨
+                        {% elif item.model_type == 'arancini' %}🟡
+                        {% elif item.model_type == 'bao' %}🥟
+                        {% elif item.model_type == 'curry' %}🥘
+                        {% else %}🍽️
+                        {% endif %}
+                    </div>
+                    <button class="btn-inspect-trigger" data-id="{{ item.id }}" title="Click to inspect in 3D">
+                        <span>🔬 3D Inspect</span>
+                    </button>
+                </div>
+
+                <!-- Card Content -->
+                <div class="card-body">
+                    <div class="card-title-row">
+                        <h3 class="card-title font-syne">{{ item.name }}</h3>
+                        <span class="card-price font-syne text-gold">₹{{ item.price }}</span>
+                    </div>
+
+                    <p class="card-tagline">{{ item.tagline }}</p>
+                    <p class="card-desc">{{ item.description }}</p>
+
+                    <!-- Culinary Tags -->
+                    <div class="card-tags-row">
+                        <span class="culinary-tag">🔥 Spice: 
+                            {% if item.spice_level == 0 %}Mild
+                            {% elif item.spice_level == 1 %}Warm
+                            {% elif item.spice_level == 2 %}Punchy
+                            {% else %}Fiery
+                            {% endif %}
+                        </span>
+                        <span class="culinary-tag">🍽️ {{ item.calories }} kcal</span>
+                        <span class="culinary-tag text-gold">★ {{ item.rating }} ({{ item.reviews_count }})</span>
+                    </div>
+
+                    <!-- Actions -->
+                    <div class="card-actions">
+                        <button class="btn btn-inspect btn-sm" data-id="{{ item.id }}">
+                            <span>🔬 Inspect in 3D</span>
+                        </button>
+                        <button class="btn btn-gold btn-sm btn-add-bag" data-id="{{ item.id }}">
+                            <span>Add to Bag +</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+
+        <!-- No Results Fallback -->
+        <div class="no-results-view" id="noResultsView" style="display: none;">
+            <div class="no-results-icon">🔍</div>
+            <h3 class="font-syne">No culinary illusions match your search</h3>
+            <p>Try searching for "cocktail", "truffle", "burger", "cheesecake", or reset filters.</p>
+            <button class="btn btn-gold-outline" id="btnResetFilters">Reset All Filters</button>
+        </div>
+    </div>
+</section>
+
+<!-- ============================================ -->
+<!-- 4. 3D FOOD INSPECTION DIALOG (TOP LAYER)     -->
+<!-- ============================================ -->
+<dialog class="three-modal glassmorphism-modal" id="threeInspectModal" aria-labelledby="modalItemTitle">
+    <div class="modal-inner">
+        <!-- Modal Header -->
+        <div class="modal-header">
+            <div class="modal-title-group">
+                <span class="modal-badge-mini" id="modalItemCategory">Farzi Molecular Sips</span>
+                <h2 class="modal-title font-syne" id="modalItemTitle">Farzi Mist Molecular Cocktail</h2>
+                <div class="modal-meta-row">
+                    <span class="diet-badge" id="modalItemDiet">🟢 VEG</span>
+                    <span class="text-gold font-syne" id="modalItemPrice">₹349</span>
+                    <span class="meta-tag" id="modalItemPrep">⚡ 4m prep</span>
+                </div>
+            </div>
+            <button class="modal-close-btn" id="modalCloseBtn" aria-label="Close 3D View">✕</button>
+        </div>
+
+        <!-- Modal 3D WebGL Canvas Stage -->
+        <div class="modal-canvas-wrap">
+            <canvas id="inspectThreeCanvas"></canvas>
+            
+            <!-- 3D Controls HUD -->
+            <div class="modal-3d-controls">
+                <button class="hud-btn" id="btnToggleExplode" title="Separate ingredients into floating 3D layers">
+                    <span class="hud-icon">💥</span>
+                    <span id="explodeBtnText">Explode Layers</span>
+                </button>
+                <button class="hud-btn" id="btnToggleRotate" title="Toggle continuous 360 degree rotation">
+                    <span class="hud-icon">🔄</span>
+                    <span>360° Rotate</span>
+                </button>
+                <button class="hud-btn" id="btnToggleSteam" title="Toggle molecular smoke & steam particles">
+                    <span class="hud-icon">💨</span>
+                    <span>Vapor Fog</span>
+                </button>
+            </div>
+
+            <div class="modal-canvas-hint">
+                <span>🖱️ Click & Drag to Orbit Dish in 360°</span>
+            </div>
+        </div>
+
+        <!-- Modal Details & Ingredients Explode Breakdown -->
+        <div class="modal-body">
+            <p class="modal-desc" id="modalItemDesc"></p>
+
+            <div class="ingredients-section">
+                <h4 class="font-syne text-gold ingredients-heading">Culinary Ingredients & Molecular Components</h4>
+                <div class="ingredients-tags" id="modalIngredientsList">
+                    <!-- Injected dynamically -->
+                </div>
+            </div>
+
+            <div class="modal-footer-row">
+                <div class="modal-price-col">
+                    <span class="label">Total Item Price</span>
+                    <span class="price-val font-syne text-gold" id="modalFooterPrice">₹349.00</span>
+                </div>
+                <div class="modal-actions-col">
+                    <button class="btn btn-gold btn-lg" id="modalAddCartBtn">
+                        <span>Add to Turbo Bag 🛍️</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</dialog>
+
+<!-- ============================================ -->
+<!-- 5. EXPRESS 1-CLICK CHECKOUT DIALOG            -->
+<!-- ============================================ -->
+<dialog class="checkout-modal glassmorphism-modal" id="checkoutModal" aria-labelledby="checkoutTitle">
+    <div class="modal-inner checkout-inner">
+        <div class="modal-header">
+            <div class="checkout-title-group">
+                <div class="turbo-badge">⚡ FARZI TURBO EXPRESS</div>
+                <h2 class="modal-title font-syne" id="checkoutTitle">Confirm 15-Minute Dispatch</h2>
+                <p class="checkout-sub">Enter delivery details for instant molecular kitchen routing</p>
+            </div>
+            <button class="modal-close-btn" id="checkoutCloseBtn" aria-label="Close Checkout">✕</button>
+        </div>
+
+        <form id="checkoutForm" class="checkout-form">
+            <div class="form-grid">
+                <div class="form-group">
+                    <label for="custName">Customer Name *</label>
+                    <input type="text" id="custName" class="form-input" placeholder="e.g. Aryan Sharma" required>
+                </div>
+                <div class="form-group">
+                    <label for="custPhone">Phone Number *</label>
+                    <input type="tel" id="custPhone" class="form-input" placeholder="e.g. 98110 12345" required>
+                </div>
+                <div class="form-group full-width">
+                    <label for="custAddress">Delivery Address *</label>
+                    <textarea id="custAddress" class="form-textarea" rows="2" placeholder="e.g. Flat 402, Royale Towers, Barakhamba Road, Connaught Place" required></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="custPincode">Delivery Pincode *</label>
+                    <input type="text" id="custPincode" class="form-input" placeholder="110001" value="110001" required>
+                </div>
+                <div class="form-group">
+                    <label for="custNotes">Chef / Delivery Notes</label>
+                    <input type="text" id="custNotes" class="form-input" placeholder="e.g. Extra dry-ice mist, gate code #44">
+                </div>
+            </div>
+
+            <!-- Delivery Speed Selector -->
+            <div class="delivery-type-selector">
+                <label class="delivery-option active">
+                    <input type="radio" name="delivery_type" value="turbo_15" checked>
+                    <div class="option-content">
+                        <div class="option-title">
+                            <span class="font-syne text-gold">⚡ Farzi Turbo 15-Minute Express</span>
+                            <span class="badge-free">FREE</span>
+                        </div>
+                        <p class="option-desc">Dispatched via dedicated electric pod • Insulated thermal vacuum lock</p>
+                    </div>
+                </label>
+            </div>
+
+            <!-- Payment Method Selector -->
+            <div class="payment-method-section">
+                <label class="section-subheading font-syne">Instant Payment Method</label>
+                <div class="payment-options-grid">
+                    <label class="payment-option active">
+                        <input type="radio" name="payment_method" value="Farzi Turbo FastPay (UPI)" checked>
+                        <div class="payment-box">
+                            <span class="pay-icon">📱</span>
+                            <span class="pay-name">UPI FastPay</span>
+                            <span class="pay-sub">GPay / PhonePe / Paytm</span>
+                        </div>
+                    </label>
+                    <label class="payment-option">
+                        <input type="radio" name="payment_method" value="Farzi 1-Click Turbo Pay">
+                        <div class="payment-box">
+                            <span class="pay-icon">⚡</span>
+                            <span class="pay-name">Farzi Turbo 1-Click</span>
+                            <span class="pay-sub">Pre-authorized Vault</span>
+                        </div>
+                    </label>
+                    <label class="payment-option">
+                        <input type="radio" name="payment_method" value="Cash / Card on Delivery">
+                        <div class="payment-box">
+                            <span class="pay-icon">💵</span>
+                            <span class="pay-name">Cash on Delivery</span>
+                            <span class="pay-sub">Pay at Doorstep</span>
+                        </div>
+                    </label>
+                </div>
+            </div>
+
+            <!-- 15-Min Guarantee Notice -->
+            <div class="guarantee-box">
+                <span class="guarantee-icon">🛡️</span>
+                <p>
+                    <strong>Farzi 15-Minute Speed Guarantee:</strong> If our delivery partner arrives after the 15-minute countdown concludes, you will receive an automatic 100% refund voucher.
+                </p>
+            </div>
+
+            <!-- Order Total Breakdown -->
+            <div class="checkout-totals-box">
+                <div class="calc-row">
+                    <span>Items Subtotal</span>
+                    <span id="checkoutSubtotal">₹0.00</span>
+                </div>
+                <div class="calc-row">
+                    <span>5% GST</span>
+                    <span id="checkoutTax">₹0.00</span>
+                </div>
+                <div class="calc-row">
+                    <span>Farzi Turbo 15-Min Delivery</span>
+                    <span class="text-gold font-bold">FREE ⚡</span>
+                </div>
+                <div class="calc-row total-row">
+                    <span class="font-syne text-lg">Total Amount</span>
+                    <span class="font-syne text-xl text-gold" id="checkoutTotal">₹0.00</span>
+                </div>
+            </div>
+
+            <!-- Submit Button -->
+            <button type="submit" class="btn btn-gold btn-block btn-xl" id="btnPlaceOrder">
+                <span>Confirm & Dispatch Order in 15 Mins ⚡</span>
+            </button>
+        </form>
+    </div>
+</dialog>
+{% endblock %}
+
+{% block extra_scripts %}
+<!-- Three.js 3D Engine Script -->
+<script src="{% static 'cafe/js/three_scene.js' %}"></script>
+{% endblock %}

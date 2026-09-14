@@ -1,0 +1,238 @@
+﻿{% extends "cafe/base.html" %}
+{% load static %}
+
+{% block title %}Live Turbo Tracking #{{ order.order_number }} | Farzi Cafe{% endblock %}
+
+{% block content %}
+<div class="tracking-page">
+    <div class="container">
+        <!-- Top Breadcrumb & Status Banner -->
+        <div class="tracking-top-bar">
+            <a href="{% url 'cafe:index' %}" class="back-link">
+                <span>← Back to Farzi Menu</span>
+            </a>
+            <div class="live-pill">
+                <span class="live-blink-dot"></span>
+                <span>LIVE TURBO TELEMETRY</span>
+            </div>
+        </div>
+
+        <!-- Main Tracking Card -->
+        <div class="tracking-main-grid">
+            <!-- Left Column: Radar & Visual Route -->
+            <div class="radar-card glassmorphism-card">
+                <div class="radar-header">
+                    <div class="radar-title-group">
+                        <span class="radar-tag font-syne text-gold">FARZI HYPER-SPEED GPS RADAR</span>
+                        <h2 class="radar-title font-syne">LIVE DELIVERY CORRIDOR</h2>
+                    </div>
+                    <div class="speed-telemetry-badge">
+                        <span class="telemetry-icon">⚡</span>
+                        <div>
+                            <span class="telemetry-speed" id="liveSpeedDisplay">52 KM/H</span>
+                            <span class="telemetry-sub">EV Turbo Cruiser</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Animated Radar Canvas -->
+                <div class="radar-viewport">
+                    <canvas id="radarCanvas" width="600" height="400"></canvas>
+                    
+                    <!-- Radar Overlay Metrics -->
+                    <div class="radar-hud-overlay">
+                        <div class="hud-item">
+                            <span class="hud-label">ESTIMATED ARRIVAL</span>
+                            <span class="hud-val font-syne text-gold" id="radarEtaCountdown">12:30</span>
+                        </div>
+                        <div class="hud-item">
+                            <span class="hud-label">DISTANCE REMAINING</span>
+                            <span class="hud-val font-syne text-neon-cyan" id="radarDistanceRemaining">1.1 km</span>
+                        </div>
+                        <div class="hud-item">
+                            <span class="hud-label">THERMAL STATUS</span>
+                            <span class="hud-val text-emerald font-bold">-196°C & 65°C Locked</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Radar Timeline Controls -->
+                <div class="radar-footer">
+                    <div class="route-nodes">
+                        <div class="node-point origin-node">
+                            <span class="node-icon">🏪</span>
+                            <div>
+                                <strong>Farzi Central Pod</strong>
+                                <p>Connaught Hub Micro-Kitchen</p>
+                            </div>
+                        </div>
+                        <div class="route-arrow">➔ ➔ ➔</div>
+                        <div class="node-point dest-node">
+                            <span class="node-icon">📍</span>
+                            <div>
+                                <strong>{{ order.customer_name }}</strong>
+                                <p>{{ order.customer_address|truncatechars:35 }}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Column: Status Steps & Partner Info -->
+            <div class="status-sidebar-col">
+                <!-- Countdown Card -->
+                <div class="countdown-card glassmorphism-card">
+                    <span class="countdown-badge">GUARANTEED 15-MIN FLASH TRANSIT</span>
+                    <div class="countdown-clock">
+                        <span class="clock-digits font-syne" id="timerDigits">11:45</span>
+                        <span class="clock-unit">MINS REMAINING</span>
+                    </div>
+                    <p class="countdown-guarantee-note">
+                        🛡️ Arriving before the clock reaches 00:00 or your entire meal is complimentary.
+                    </p>
+                </div>
+
+                <!-- Live Progress Pipeline -->
+                <div class="pipeline-card glassmorphism-card">
+                    <h3 class="pipeline-title font-syne">Order Progression</h3>
+                    <div class="timeline-steps" id="timelineSteps">
+                        <!-- Populated and updated by tracker.js -->
+                        <div class="timeline-step step-received active" data-step="received">
+                            <div class="step-indicator">
+                                <span class="step-dot"></span>
+                                <span class="step-line"></span>
+                            </div>
+                            <div class="step-content">
+                                <h4 class="step-title">1. Order Accepted</h4>
+                                <p class="step-desc">Molecular kitchen alerted & recipe cards dispatched</p>
+                            </div>
+                        </div>
+
+                        <div class="timeline-step step-preparing" data-step="preparing">
+                            <div class="step-indicator">
+                                <span class="step-dot"></span>
+                                <span class="step-line"></span>
+                            </div>
+                            <div class="step-content">
+                                <h4 class="step-title">2. Molecular Gastronomy Prep</h4>
+                                <p class="step-desc">Chefs infusing liquid nitrogen vapor & smoked oakwood</p>
+                            </div>
+                        </div>
+
+                        <div class="timeline-step step-packed" data-step="packed">
+                            <div class="step-indicator">
+                                <span class="step-dot"></span>
+                                <span class="step-line"></span>
+                            </div>
+                            <div class="step-content">
+                                <h4 class="step-title">3. Flash Nitrogen Thermal Packaging</h4>
+                                <p class="step-desc">Vacuum sealed in heat & sub-zero insulated canisters</p>
+                            </div>
+                        </div>
+
+                        <div class="timeline-step step-dispatched" data-step="dispatched">
+                            <div class="step-indicator">
+                                <span class="step-dot"></span>
+                                <span class="step-line"></span>
+                            </div>
+                            <div class="step-content">
+                                <h4 class="step-title">4. Turbo Courier on Route</h4>
+                                <p class="step-desc">High-speed electric bike navigating traffic corridor</p>
+                            </div>
+                        </div>
+
+                        <div class="timeline-step step-delivered" data-step="delivered">
+                            <div class="step-indicator">
+                                <span class="step-dot"></span>
+                            </div>
+                            <div class="step-content">
+                                <h4 class="step-title">5. Arrived & Served</h4>
+                                <p class="step-desc">At your doorstep hot, fresh, and visually stunning</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Assigned Courier Partner Card -->
+                <div class="partner-card glassmorphism-card" id="partnerCard">
+                    <div class="partner-avatar">
+                        {% if partner %}{{ partner.avatar }}{% else %}⚡{% endif %}
+                    </div>
+                    <div class="partner-details">
+                        <div class="partner-name-row">
+                            <h4 class="partner-name font-syne" id="partnerName">
+                                {% if partner %}{{ partner.name }}{% else %}Farhan "Nitro" Qureshi{% endif %}
+                            </h4>
+                            <span class="partner-rating text-gold">★ {% if partner %}{{ partner.rating }}{% else %}4.98{% endif %}</span>
+                        </div>
+                        <p class="partner-vehicle" id="partnerVehicle">
+                            {% if partner %}{{ partner.vehicle_type }} ({{ partner.vehicle_number }}){% else %}Farzi Turbo Hyperspeed EV (FZ-TURBO-01){% endif %}
+                        </p>
+                        <div class="partner-actions">
+                            <button class="btn btn-sm btn-glass" id="btnCallPartner">
+                                <span>📞 Call Courier</span>
+                            </button>
+                            <button class="btn btn-sm btn-glass" id="btnMessagePartner">
+                                <span>💬 Message</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Order Receipt Card -->
+                <div class="order-receipt-card glassmorphism-card">
+                    <div class="receipt-header">
+                        <span class="font-syne text-gold">Order #{{ order.order_number }}</span>
+                        <span class="receipt-date">{{ order.created_at|date:"d M, h:i A" }}</span>
+                    </div>
+
+                    <div class="receipt-items-list">
+                        {% for item in items %}
+                        <div class="receipt-item-row">
+                            <div class="receipt-item-name">
+                                <span class="qty-badge">{{ item.quantity }}x</span>
+                                <span>{{ item.menu_item.name }}</span>
+                            </div>
+                            <span class="receipt-item-price font-syne">₹{{ item.total_price }}</span>
+                        </div>
+                        {% endfor %}
+                    </div>
+
+                    <div class="receipt-divider"></div>
+
+                    <div class="receipt-summary">
+                        <div class="receipt-line">
+                            <span>Subtotal</span>
+                            <span>₹{{ order.subtotal }}</span>
+                        </div>
+                        <div class="receipt-line">
+                            <span>GST (5%)</span>
+                            <span>₹{{ order.tax_amount }}</span>
+                        </div>
+                        <div class="receipt-line">
+                            <span>15-Min Turbo Transit</span>
+                            <span class="text-gold font-bold">FREE ⚡</span>
+                        </div>
+                        <div class="receipt-total-row">
+                            <span class="font-syne text-lg">Total Paid</span>
+                            <span class="font-syne text-xl text-gold">₹{{ order.total_amount }}</span>
+                        </div>
+                        <div class="payment-method-chip">
+                            <span>Paid via: {{ order.payment_method }}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Embedded Order Meta for tracker.js -->
+<script>
+    window.TRACKING_ORDER_NUMBER = "{{ order.order_number }}";
+</script>
+{% endblock %}
+
+{% block extra_scripts %}
+<script src="{% static 'cafe/js/tracker.js' %}"></script>
+{% endblock %}
